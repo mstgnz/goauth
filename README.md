@@ -18,13 +18,13 @@ import (
 	"log"
 	"net/http"
 
-	define "github.com/mstgnz/goauth/defines"
+	config "github.com/mstgnz/goauth/config"
 	"github.com/mstgnz/goauth/providers"
 	"golang.org/x/oauth2"
 )
 
 var err error
-var provider define.Provider
+var provider config.Provider
 
 func main() {
 
