@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/mstgnz/goauth/defines"
+	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 )
 

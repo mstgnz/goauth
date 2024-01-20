@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/mstgnz/goauth/defines"
+	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/twitch"
 )

@@ -3,7 +3,7 @@ package goauth
 import (
 	"errors"
 
-	"github.com/mstgnz/goauth/defines"
+	"github.com/mstgnz/goauth/config"
 )
 
 // providerMap is a map that associates Provider names with their corresponding constructor functions.

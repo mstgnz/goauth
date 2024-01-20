@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/mstgnz/goauth/defines"
+	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 )
 

@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/mstgnz/goauth/defines"
+	"github.com/mstgnz/goauth/config"
 	"github.com/spf13/cast"
 	"golang.org/x/oauth2"
 )
