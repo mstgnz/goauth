@@ -2,11 +2,39 @@
 
 The `goauth` package provides a common interface and implementations for OAuth2 authorization flows in Go. This package can be used to integrate with various OAuth2 providers (such as Apple, Discord, Facebook, etc.).
 
+
 ## Installation
 To add the package to your project, run the following command in the terminal:
+
 ```bash
 go get -u github.com/mstgnz/goauth
 ```
+
+
+## Supported OAuth2 Providers
+
+- Apple - [Apple Developer](https://developer.apple.com/)
+- Discord - [Discord Developer](https://discord.com/developers/docs)
+- Facebook - [Facebook for Developers](https://developers.facebook.com/)
+- Gitea - [Gitea Developer](https://gitea.io/en-us/docs/)
+- Gitee - [Gitee Developer](https://gitee.com/help)
+- GitHub - [GitHub Developer](https://developer.github.com/)
+- GitLab - [GitLab Developer](https://docs.gitlab.com/ee/api/)
+- Google - [Google Identity Platform](https://developers.google.com/identity)
+- Instagram - [Instagram Graph API](https://developers.facebook.com/docs/instagram-api)
+- Kakao - [Kakao Developers](https://developers.kakao.com/)
+- LiveChat - [LiveChat API](https://developers.livechat.com/docs/rest-api/)
+- Mailcow - [Mailcow API](https://mailcow.github.io/mailcow-dockerized-docs/)
+- Microsoft - [Microsoft Identity Platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
+- OIDC - [OpenID Connect](https://openid.net/connect/)
+- Patreon - [Patreon API](https://docs.patreon.com/#introduction)
+- Spotify - [Spotify for Developers](https://developer.spotify.com/documentation/general/)
+- Strava - [Strava API](https://developers.strava.com/)
+- Twitch - [Twitch Developers](https://dev.twitch.tv/docs)
+- Twitter - [Twitter Developer](https://developer.twitter.com/)
+- VK - [VK API](https://vk.com/dev)
+- Yandex - [Yandex Passport API](https://yandex.com/dev/passport/)
+
 
 ## Usage
 To use the package in your project, you can create an example as follows:
@@ -59,6 +87,7 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
+
 ## Providers
 The `goauth` package supports various popular OAuth2 providers. For each provider, you will need to provide the following information:
 
@@ -72,10 +101,10 @@ The `goauth` package supports various popular OAuth2 providers. For each provide
 - `Scopes`: The access permissions you want to request.
 - `Pkce`: Whether the provider supports the PKCE flow.
 
+
 ## Contribution
 If you want to contribute to improving `goauth` or adding new providers, please open an issue or submit a pull request.
 
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
