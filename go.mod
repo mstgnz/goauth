@@ -1,6 +1,6 @@
 module github.com/mstgnz/goauth
 
-go 1.21.2
+go 1.22
 
 require (
 	github.com/go-playground/validator/v10 v10.17.0

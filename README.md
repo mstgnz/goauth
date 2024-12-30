@@ -85,6 +85,143 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 		log.Println(user)
 	}
 }
+
+## Provider Examples
+
+### GitHub
+```go
+provider, _ := goauth.NewProviderByName("github")
+provider.SetClientId("your-client-id")
+provider.SetClientSecret("your-client-secret")
+provider.SetRedirectUrl("http://localhost:8585/callback")
+// Default scopes: read:user, user:email
+provider.SetScopes([]string{"read:user", "user:email", "repo"})
+```
+
+### Google
+```go
+provider, _ := goauth.NewProviderByName("google")
+provider.SetClientId("your-client-id")
+provider.SetClientSecret("your-client-secret")
+provider.SetRedirectUrl("http://localhost:8585/callback")
+// Default scopes: profile, email
+provider.SetScopes([]string{"profile", "email", "https://www.googleapis.com/auth/calendar.readonly"})
+```
+
+### Facebook
+```go
+provider, _ := goauth.NewProviderByName("facebook")
+provider.SetClientId("your-client-id")
+provider.SetClientSecret("your-client-secret")
+provider.SetRedirectUrl("http://localhost:8585/callback")
+// Default scopes: email, public_profile
+provider.SetScopes([]string{"email", "public_profile", "user_friends"})
+```
+
+### Discord
+```go
+provider, _ := goauth.NewProviderByName("discord")
+provider.SetClientId("your-client-id")
+provider.SetClientSecret("your-client-secret")
+provider.SetRedirectUrl("http://localhost:8585/callback")
+// Default scopes: identify, email
+provider.SetScopes([]string{"identify", "email", "guilds"})
+```
+
+### Apple
+```go
+provider, _ := goauth.NewProviderByName("apple")
+provider.SetClientId("your-client-id")
+provider.SetClientSecret("your-client-secret") // Must be a JWT token
+provider.SetRedirectUrl("http://localhost:8585/callback")
+// Default scopes: name, email
+provider.SetScopes([]string{"name", "email"})
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+1. **Invalid Client ID/Secret**
+   - Error: "invalid_client" or "unauthorized_client"
+   - Solution: 
+     - Verify that the Client ID and Secret are correct
+     - Check if the RedirectURL is properly configured in the provider's developer console
+     - Ensure HTTPS is used for providers that require SSL
+
+2. **Invalid Redirect URI**
+   - Error: "redirect_uri_mismatch"
+   - Solution:
+     - Verify that the RedirectURL in your code matches exactly with the one configured in the provider's developer console
+     - Ensure exact match including http/https, www/non-www, and trailing slash
+
+3. **Invalid Scope**
+   - Error: "invalid_scope"
+   - Solution:
+     - Verify that the requested scopes are supported by the provider
+     - Check if the scopes are formatted correctly
+     - Ensure the scopes are enabled in the provider's developer console
+
+4. **Unable to Get Token**
+   - Error: "invalid_grant" or "invalid_request"
+   - Solution:
+     - Ensure the authorization code is used only once
+     - Verify that the token request includes correct parameters
+     - If using PKCE, verify the code verifier is correct
+
+5. **Unable to Fetch User Information**
+   - Error: API call fails
+   - Solution:
+     - Verify the token is valid
+     - Ensure you have requested sufficient scopes for the information
+     - Check if the API endpoint is correct
+
+### Provider-Specific Issues
+
+1. **Apple Sign In**
+   - Client Secret must be in JWT format
+   - Verify the private key format is correct
+   - Check Team ID and Bundle ID configuration
+
+2. **Facebook**
+   - App Review might be required
+   - SSL certificate is mandatory
+   - Verify Graph API version compatibility
+
+3. **Google**
+   - Check consent screen configuration
+   - Ensure required APIs are enabled for the project
+   - Verify required scopes are added to OAuth consent screen
+
+4. **GitHub**
+   - Monitor rate limiting
+   - Additional permissions needed for organization access
+   - Verify appropriate scopes for private repo access
+
+### Debugging Tips
+
+1. **Debug Logs**
+```go
+// Enable debug mode
+provider.SetDebug(true)
+```
+
+2. **Monitor HTTP Requests**
+```go
+// Customize HTTP client
+client := &http.Client{
+    Transport: &loggingTransport{http.DefaultTransport},
+}
+provider.SetHttpClient(client)
+```
+
+3. **Inspect Token Information**
+```go
+token, _ := provider.FetchToken(code)
+log.Printf("Access Token: %s", token.AccessToken)
+log.Printf("Token Type: %s", token.TokenType)
+log.Printf("Refresh Token: %s", token.RefreshToken)
+log.Printf("Expiry: %s", token.Expiry)
 ```
 
 
