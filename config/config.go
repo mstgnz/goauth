@@ -1,4 +1,4 @@
-package goauth
+package config
 
 import (
 	"context"
@@ -22,6 +22,7 @@ type OAuth2Config struct {
 	UserApiUrl   string          // URL for fetching user information from the provider.
 	Scopes       []string        // Requested access permissions from the provider.
 	Pkce         bool            // Indicates whether the provider supports the PKCE flow.
+	TeamID       string          // Team ID for Apple Sign In.
 }
 
 // GetContext retrieves the context associated with the OAuth2 provider.
@@ -239,4 +240,16 @@ func (oc *OAuth2Config) oauth2Config() *oauth2.Config {
 			TokenURL: oc.TokenUrl,
 		},
 	}
+}
+
+// GetTeamID retrieves the Team ID associated with the OAuth2 provider.
+// This is specifically used for Apple Sign In.
+func (oc *OAuth2Config) GetTeamID() string {
+	return oc.TeamID
+}
+
+// SetTeamID assigns the specified Team ID to the OAuth2 provider.
+// This is specifically used for Apple Sign In.
+func (oc *OAuth2Config) SetTeamID(teamID string) {
+	oc.TeamID = teamID
 }
