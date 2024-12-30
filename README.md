@@ -31,7 +31,7 @@ go get -u github.com/mstgnz/goauth
 - Spotify - [Spotify for Developers](https://developer.spotify.com/documentation/general/)
 - Strava - [Strava API](https://developers.strava.com/)
 - Twitch - [Twitch Developers](https://dev.twitch.tv/docs)
-- Twitter - [Twitter Developer](https://developer.twitter.com/)
+- X - [X Developer](https://developer.x.com/)
 - VK - [VK API](https://vk.com/dev)
 - Yandex - [Yandex Passport API](https://yandex.com/dev/passport/)
 
@@ -46,8 +46,6 @@ import (
 	"log"
 	"net/http"
 
-	config "github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/providers"
 	"golang.org/x/oauth2"
 )
 
