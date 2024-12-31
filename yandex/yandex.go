@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/yandex"
@@ -19,7 +19,7 @@ type yandexProvider struct {
 
 // NewYandexProvider creates new yandexProvider provider instance with some defaults.
 // Docs: https://yandex.ru/dev/id/doc/en/
-func NewYandexProvider() provider.Provider {
+func NewYandexProvider() goauth.Provider {
 	return &yandexProvider{&config.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "yandexProvider",

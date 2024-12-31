@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -24,12 +24,12 @@ func init() {
 // giteeProvider allows authentication via Gitee OAuth2.
 type giteeProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 	EmailApiUrl string
 }
 
 // NewGiteeProvider creates new Gitee provider instance with some defaults.
-func NewGiteeProvider() provider.Provider {
+func NewGiteeProvider() goauth.Provider {
 	return &giteeProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -40,7 +40,7 @@ func NewGiteeProvider() provider.Provider {
 			Scopes:      []string{"user_info"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 		EmailApiUrl:  "https://gitee.com/api/v5/emails",
 	}
 }
@@ -146,7 +146,7 @@ func (p *giteeProvider) fetchPrimaryEmail(token *oauth2.Token) (string, error) {
 	if err = json.Unmarshal(content, &emails); err != nil {
 		// ignore unmarshal error in case "Keep my email address private"
 		// was set because response.Body will be something like:
-		// {"email":"12285415+test@user.noreply.giteeProvider.com"}
+		// {"email":"12285415+test@user.noreply.giteegoauth.com"}
 		return "", nil
 	}
 

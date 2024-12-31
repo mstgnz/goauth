@@ -7,8 +7,8 @@ import (
 	"io"
 	"strconv"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -19,7 +19,7 @@ type gitHubProvider struct {
 }
 
 // NewGithubProvider creates new gitHubProvider provider instance with some defaults.
-func NewGithubProvider() provider.Provider {
+func NewGithubProvider() goauth.Provider {
 	return &gitHubProvider{&config.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "GitHub",

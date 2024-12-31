@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 )
@@ -13,11 +13,11 @@ import (
 // facebookProvider allows authentication via Facebook OAuth2.
 type facebookProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewFacebookProvider creates new Facebook provider instance with some defaults.
-func NewFacebookProvider() provider.Provider {
+func NewFacebookProvider() goauth.Provider {
 	return &facebookProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -28,7 +28,7 @@ func NewFacebookProvider() provider.Provider {
 			Scopes:      []string{"email", "public_profile"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

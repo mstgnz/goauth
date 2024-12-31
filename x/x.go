@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -24,7 +24,7 @@ type xProvider struct {
 	tokenUrl     string
 }
 
-func NewXProvider() provider.Provider {
+func NewXProvider() goauth.Provider {
 	oauth2Config := &config.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "X (Twitter)",

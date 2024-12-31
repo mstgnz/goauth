@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -24,7 +24,7 @@ type oidcProvider struct {
 	tokenUrl     string
 }
 
-func NewOidcProvider() provider.Provider {
+func NewOidcProvider() goauth.Provider {
 	oauth2Config := &config.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "OpenID Connect",

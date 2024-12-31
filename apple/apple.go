@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"github.com/spf13/cast"
 	"golang.org/x/oauth2"
 )
@@ -24,12 +24,12 @@ import (
 // [OIDC differences]: https://bitbucket.org/openid/connect/src/master/How-Sign-in-with-Apple-differs-from-OpenID-Connect.md
 type appleProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 	jwkUrl string
 }
 
 // NewAppleProvider creates a new Apple provider instance with some defaults.
-func NewAppleProvider() provider.Provider {
+func NewAppleProvider() goauth.Provider {
 	return &appleProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -40,7 +40,7 @@ func NewAppleProvider() provider.Provider {
 			Scopes:      []string{"name", "email"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 		jwkUrl:       "https://appleid.apple.com/auth/keys",
 	}
 }
@@ -115,7 +115,7 @@ func (p *appleProvider) FetchUser(token *oauth2.Token) (*config.Credential, erro
 	return user, nil
 }
 
-// FetchRawData implements Provider.FetchRawData interface.
+// FetchRawData implements goauth.FetchRawData interface.
 // Apple doesn't have a UserInfo endpoint, and claims about users
 // are instead included in the "id_token" (https://openid.net/specs/openid-connect-core-1_0.html#id_tokenExample)
 func (p *appleProvider) FetchRawData(token *oauth2.Token) ([]byte, error) {

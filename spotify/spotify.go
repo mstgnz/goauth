@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -14,11 +14,11 @@ import (
 // spotifyProvider allows authentication via Spotify OAuth2.
 type spotifyProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewSpotifyProvider creates new Spotify provider instance with some defaults.
-func NewSpotifyProvider() provider.Provider {
+func NewSpotifyProvider() goauth.Provider {
 	return &spotifyProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -29,7 +29,7 @@ func NewSpotifyProvider() provider.Provider {
 			Scopes:      []string{"user-read-email", "user-read-private"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

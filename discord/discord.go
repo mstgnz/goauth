@@ -6,19 +6,19 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 )
 
 // discordProvider allows authentication via Discord OAuth2.
 type discordProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewDiscordProvider creates new Discord provider instance with some defaults.
-func NewDiscordProvider() provider.Provider {
+func NewDiscordProvider() goauth.Provider {
 	return &discordProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -29,7 +29,7 @@ func NewDiscordProvider() provider.Provider {
 			Scopes:      []string{"identify", "email"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

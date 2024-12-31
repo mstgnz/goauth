@@ -6,8 +6,8 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -15,11 +15,11 @@ import (
 // twitchProvider allows authentication via Twitch OAuth2.
 type twitchProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewTwitchProvider creates new Twitch provider instance with some defaults.
-func NewTwitchProvider() provider.Provider {
+func NewTwitchProvider() goauth.Provider {
 	return &twitchProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -30,7 +30,7 @@ func NewTwitchProvider() provider.Provider {
 			Scopes:      []string{"user:read:email"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 
@@ -100,7 +100,7 @@ func (p *twitchProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 	return user, nil
 }
 
-// FetchRawData implements provider.FetchRawData interface.
+// FetchRawData implements goauth.FetchRawData interface.
 // This differs from oAuth2Provider because twitchProvider requires the `Client-Id` header.
 func (p *twitchProvider) FetchRawData(token *oauth2.Token) ([]byte, error) {
 	req, err := http.NewRequest("GET", p.GetUserApiUrl(), nil)

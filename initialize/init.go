@@ -3,6 +3,7 @@ package initialize
 import (
 	"fmt"
 
+	provider "github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/apple"
 	"github.com/mstgnz/goauth/discord"
 	"github.com/mstgnz/goauth/facebook"
@@ -18,7 +19,6 @@ import (
 	"github.com/mstgnz/goauth/microsoft"
 	"github.com/mstgnz/goauth/oidc"
 	"github.com/mstgnz/goauth/patreon"
-	"github.com/mstgnz/goauth/provider"
 	"github.com/mstgnz/goauth/spotify"
 	"github.com/mstgnz/goauth/strava"
 	"github.com/mstgnz/goauth/twitch"

@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	provider "github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/initialize"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -13,11 +13,11 @@ import (
 // instagramProvider allows authentication via Instagram OAuth2.
 type instagramProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewInstagramProvider creates new Instagram provider instance with some defaults.
-func NewInstagramProvider() provider.Provider {
+func NewInstagramProvider() goauth.Provider {
 	return &instagramProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -28,7 +28,7 @@ func NewInstagramProvider() provider.Provider {
 			Scopes:      []string{"user_profile"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

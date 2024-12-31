@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -17,7 +17,7 @@ type googleProvider struct {
 }
 
 // NewGoogleProvider creates new googleProvider provider instance with some defaults.
-func NewGoogleProvider() provider.Provider {
+func NewGoogleProvider() goauth.Provider {
 	return &googleProvider{&config.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "googleProvider",

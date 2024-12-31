@@ -6,19 +6,19 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 	"golang.org/x/oauth2"
 )
 
 // giteaProvider allows authentication via Gitea OAuth2.
 type giteaProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewGiteaProvider creates new Gitea provider instance with some defaults.
-func NewGiteaProvider() provider.Provider {
+func NewGiteaProvider() goauth.Provider {
 	return &giteaProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -29,7 +29,7 @@ func NewGiteaProvider() provider.Provider {
 			Scopes:      []string{"read:user"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

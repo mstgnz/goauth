@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/kakao"
@@ -27,7 +27,7 @@ type kakaoProvider struct {
 }
 
 // NewKakaoProvider creates a new kakaoProvider provider instance with some defaults.
-func NewKakaoProvider() provider.Provider {
+func NewKakaoProvider() goauth.Provider {
 	oauth2Config := &config.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Kakao",

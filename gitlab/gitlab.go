@@ -6,8 +6,8 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -15,11 +15,11 @@ import (
 // gitlabProvider allows authentication via gitlabProvider OAuth2.
 type gitlabProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewGitlabProvider creates new gitlabProvider provider instance with some defaults.
-func NewGitlabProvider() provider.Provider {
+func NewGitlabProvider() goauth.Provider {
 	return &gitlabProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -30,7 +30,7 @@ func NewGitlabProvider() provider.Provider {
 			Scopes:      []string{"read_user"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 

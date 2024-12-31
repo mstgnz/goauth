@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -23,7 +23,7 @@ type mailcowProvider struct {
 	tokenUrl     string
 }
 
-func NewMailcowProvider() provider.Provider {
+func NewMailcowProvider() goauth.Provider {
 	oauth2Config := &config.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Mailcow",

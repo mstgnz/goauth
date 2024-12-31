@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/config"
-	"github.com/mstgnz/goauth/provider"
 
 	"golang.org/x/oauth2"
 )
@@ -14,11 +14,11 @@ import (
 // microsoftProvider allows authentication via Microsoft OAuth2.
 type microsoftProvider struct {
 	*config.OAuth2Config
-	provider.BaseProvider
+	goauth.BaseProvider
 }
 
 // NewMicrosoftProvider creates new Microsoft provider instance with some defaults.
-func NewMicrosoftProvider() provider.Provider {
+func NewMicrosoftProvider() goauth.Provider {
 	return &microsoftProvider{
 		OAuth2Config: &config.OAuth2Config{
 			Ctx:         context.Background(),
@@ -29,7 +29,7 @@ func NewMicrosoftProvider() provider.Provider {
 			Scopes:      []string{"User.Read"},
 			Pkce:        true,
 		},
-		BaseProvider: provider.BaseProvider{},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 
