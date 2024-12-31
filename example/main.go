@@ -3,27 +3,43 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/initialize"
+	"github.com/mstgnz/goauth/middleware"
 	"golang.org/x/oauth2"
 )
 
 var provide goauth.Provider
 
 func main() {
-
 	provide, err := initialize.NewProviderByName("github")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	provide.SetRedirectUrl("http://localhost:8585/callback")
 
-	http.HandleFunc("/login", handleLogin)
-	http.HandleFunc("/callback", handleCallback)
+	// Rate limiter oluştur: 60 saniyede maksimum 100 istek
+	rateLimiter := middleware.NewRateLimiter(100, 60*time.Second)
 
-	log.Fatal(http.ListenAndServe(":8585", nil))
+	// HTTP handler'ları oluştur
+	mux := http.NewServeMux()
+	mux.HandleFunc("/login", handleLogin)
+	mux.HandleFunc("/callback", handleCallback)
 
+	// Rate limiter middleware'ini ekle
+	handler := rateLimiter.Middleware(mux)
+
+	// Periyodik temizlik için goroutine başlat
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		for range ticker.C {
+			rateLimiter.CleanupOldEntries()
+		}
+	}()
+
+	log.Fatal(http.ListenAndServe(":8585", handler))
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
