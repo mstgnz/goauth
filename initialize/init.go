@@ -3,7 +3,7 @@ package initialize
 import (
 	"fmt"
 
-	provider "github.com/mstgnz/goauth"
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/apple"
 	"github.com/mstgnz/goauth/discord"
 	"github.com/mstgnz/goauth/facebook"
@@ -29,12 +29,12 @@ import (
 
 var (
 	// providers holds all registered OAuth2 providers.
-	providers = map[string]func() provider.Provider{}
+	providers = map[string]func() goauth.Provider{}
 )
 
 // init registers all available OAuth2 providers.
 func init() {
-	providers = map[string]func() provider.Provider{
+	providers = map[string]func() goauth.Provider{
 		"apple":     apple.NewAppleProvider,
 		"discord":   discord.NewDiscordProvider,
 		"facebook":  facebook.NewFacebookProvider,
@@ -60,7 +60,7 @@ func init() {
 }
 
 // NewProviderByName creates a new OAuth2 provider instance by its name.
-func NewProviderByName(name string) (provider.Provider, error) {
+func NewProviderByName(name string) (goauth.Provider, error) {
 	if provider, ok := providers[name]; ok {
 		return provider(), nil
 	}
