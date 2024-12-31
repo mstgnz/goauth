@@ -2,7 +2,6 @@
 
 The `goauth` package provides a common interface and implementations for OAuth2 authorization flows in Go. This package can be used to integrate with various OAuth2 providers (such as Apple, Discord, Facebook, etc.).
 
-
 ## Installation
 To add the package to your project, run the following command in the terminal:
 
@@ -10,6 +9,132 @@ To add the package to your project, run the following command in the terminal:
 go get -u github.com/mstgnz/goauth
 ```
 
+## Documentation
+
+### Package Structure
+The package is organized as follows:
+
+```
+goauth/
+├── provider/         # Base provider interface and common functionality
+├── apple/           # Apple OAuth2 provider implementation
+├── discord/         # Discord OAuth2 provider implementation
+├── facebook/        # Facebook OAuth2 provider implementation
+├── github/          # GitHub OAuth2 provider implementation
+├── google/          # Google OAuth2 provider implementation
+└── example/         # Example implementations for each provider
+```
+
+### Provider Interface
+All OAuth2 providers implement the following interface:
+
+```go
+type Provider interface {
+    SetClientId(string)
+    SetClientSecret(string)
+    SetRedirectUrl(string)
+    SetScopes([]string)
+    BuildAuthUrl(string, ...oauth2.AuthCodeOption) string
+    FetchToken(string) (*oauth2.Token, error)
+    FetchUser(*oauth2.Token) (*User, error)
+    RefreshToken(*oauth2.Token) (*oauth2.Token, error)
+    ValidateConfig() error
+    Client(*oauth2.Token) *http.Client
+}
+```
+
+### User Type
+User information is returned in a standardized format:
+
+```go
+type User struct {
+    ID       string
+    Username string
+    Name     string
+    Email    string
+    Avatar   string
+}
+```
+
+## Example Usage
+
+### GitHub OAuth2
+
+```go
+package main
+
+import (
+    "log"
+    "net/http"
+    "github.com/mstgnz/goauth"
+    "golang.org/x/oauth2"
+)
+
+func main() {
+    provider, err := goauth.NewProviderByName("github")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    provider.SetClientId("your-client-id")
+    provider.SetClientSecret("your-client-secret")
+    provider.SetRedirectUrl("http://localhost:8080/callback")
+    provider.SetScopes([]string{"read:user", "user:email"})
+
+    http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+        url := provider.BuildAuthUrl("state", oauth2.AccessTypeOffline)
+        http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+    })
+
+    http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+        token, err := provider.FetchToken(r.URL.Query().Get("code"))
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        user, err := provider.FetchUser(token)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        log.Printf("Logged in user: %+v", user)
+    })
+
+    log.Fatal(http.ListenAndServe(":8080", nil))
+}
+```
+
+### Google OAuth2
+
+```go
+package main
+
+import (
+    "log"
+    "net/http"
+    "github.com/mstgnz/goauth"
+    "golang.org/x/oauth2"
+)
+
+func main() {
+    provider, err := goauth.NewProviderByName("google")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    provider.SetClientId("your-client-id")
+    provider.SetClientSecret("your-client-secret")
+    provider.SetRedirectUrl("http://localhost:8080/callback")
+    provider.SetScopes([]string{
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+    })
+
+    // ... HTTP handlers similar to GitHub example ...
+}
+```
 
 ## Supported OAuth2 Providers
 
@@ -35,211 +160,20 @@ go get -u github.com/mstgnz/goauth
 - VK - [VK API](https://vk.com/dev)
 - Yandex - [Yandex Passport API](https://yandex.com/dev/passport/)
 
+## Security Considerations
 
-## Usage
-To use the package in your project, you can create an example as follows:
+1. Always use HTTPS in production
+2. Validate state parameter to prevent CSRF attacks
+3. Store tokens securely
+4. Use environment variables for client credentials
+5. Implement PKCE when supported by the provider
+6. Keep scopes to the minimum required
+7. Handle token expiration and refresh properly
 
-```go
-package main
+## Contributing
 
-import (
-	"log"
-	"net/http"
-
-	"golang.org/x/oauth2"
-)
-
-var err error
-var provider config.Provider
-
-func main() {
-
-	provider, err = goauth.NewProviderByName("github")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	provider.SetRedirectUrl("http://localhost:8585/callback")
-
-	http.HandleFunc("/login", handleLogin)
-	http.HandleFunc("/callback", handleCallback)
-
-	log.Fatal(http.ListenAndServe(":8585", nil))
-
-}
-
-func handleLogin(w http.ResponseWriter, r *http.Request) {
-	url := provider.BuildAuthUrl("state", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-}
-
-func handleCallback(w http.ResponseWriter, r *http.Request) {
-	token, err := provider.FetchToken(r.URL.Query().Get("code"))
-	if err != nil {
-		log.Println(err)
-	}
-	if user, err := provider.FetchUser(token); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(user)
-	}
-}
-
-## Provider Examples
-
-### GitHub
-```go
-provider, _ := goauth.NewProviderByName("github")
-provider.SetClientId("your-client-id")
-provider.SetClientSecret("your-client-secret")
-provider.SetRedirectUrl("http://localhost:8585/callback")
-// Default scopes: read:user, user:email
-provider.SetScopes([]string{"read:user", "user:email", "repo"})
-```
-
-### Google
-```go
-provider, _ := goauth.NewProviderByName("google")
-provider.SetClientId("your-client-id")
-provider.SetClientSecret("your-client-secret")
-provider.SetRedirectUrl("http://localhost:8585/callback")
-// Default scopes: profile, email
-provider.SetScopes([]string{"profile", "email", "https://www.googleapis.com/auth/calendar.readonly"})
-```
-
-### Facebook
-```go
-provider, _ := goauth.NewProviderByName("facebook")
-provider.SetClientId("your-client-id")
-provider.SetClientSecret("your-client-secret")
-provider.SetRedirectUrl("http://localhost:8585/callback")
-// Default scopes: email, public_profile
-provider.SetScopes([]string{"email", "public_profile", "user_friends"})
-```
-
-### Discord
-```go
-provider, _ := goauth.NewProviderByName("discord")
-provider.SetClientId("your-client-id")
-provider.SetClientSecret("your-client-secret")
-provider.SetRedirectUrl("http://localhost:8585/callback")
-// Default scopes: identify, email
-provider.SetScopes([]string{"identify", "email", "guilds"})
-```
-
-### Apple
-```go
-provider, _ := goauth.NewProviderByName("apple")
-provider.SetClientId("your-client-id")
-provider.SetClientSecret("your-client-secret") // Must be a JWT token
-provider.SetRedirectUrl("http://localhost:8585/callback")
-// Default scopes: name, email
-provider.SetScopes([]string{"name", "email"})
-```
-
-## Troubleshooting Guide
-
-### Common Issues and Solutions
-
-1. **Invalid Client ID/Secret**
-   - Error: "invalid_client" or "unauthorized_client"
-   - Solution: 
-     - Verify that the Client ID and Secret are correct
-     - Check if the RedirectURL is properly configured in the provider's developer console
-     - Ensure HTTPS is used for providers that require SSL
-
-2. **Invalid Redirect URI**
-   - Error: "redirect_uri_mismatch"
-   - Solution:
-     - Verify that the RedirectURL in your code matches exactly with the one configured in the provider's developer console
-     - Ensure exact match including http/https, www/non-www, and trailing slash
-
-3. **Invalid Scope**
-   - Error: "invalid_scope"
-   - Solution:
-     - Verify that the requested scopes are supported by the provider
-     - Check if the scopes are formatted correctly
-     - Ensure the scopes are enabled in the provider's developer console
-
-4. **Unable to Get Token**
-   - Error: "invalid_grant" or "invalid_request"
-   - Solution:
-     - Ensure the authorization code is used only once
-     - Verify that the token request includes correct parameters
-     - If using PKCE, verify the code verifier is correct
-
-5. **Unable to Fetch User Information**
-   - Error: API call fails
-   - Solution:
-     - Verify the token is valid
-     - Ensure you have requested sufficient scopes for the information
-     - Check if the API endpoint is correct
-
-### Provider-Specific Issues
-
-1. **Apple Sign In**
-   - Client Secret must be in JWT format
-   - Verify the private key format is correct
-   - Check Team ID and Bundle ID configuration
-
-2. **Facebook**
-   - App Review might be required
-   - SSL certificate is mandatory
-   - Verify Graph API version compatibility
-
-3. **Google**
-   - Check consent screen configuration
-   - Ensure required APIs are enabled for the project
-   - Verify required scopes are added to OAuth consent screen
-
-4. **GitHub**
-   - Monitor rate limiting
-   - Additional permissions needed for organization access
-   - Verify appropriate scopes for private repo access
-
-### Debugging Tips
-
-1. **Debug Logs**
-```go
-// Enable debug mode
-provider.SetDebug(true)
-```
-
-2. **Monitor HTTP Requests**
-```go
-// Customize HTTP client
-client := &http.Client{
-    Transport: &loggingTransport{http.DefaultTransport},
-}
-provider.SetHttpClient(client)
-```
-
-3. **Inspect Token Information**
-```go
-token, _ := provider.FetchToken(code)
-log.Printf("Access Token: %s", token.AccessToken)
-log.Printf("Token Type: %s", token.TokenType)
-log.Printf("Refresh Token: %s", token.RefreshToken)
-log.Printf("Expiry: %s", token.Expiry)
-```
-
-
-## Providers
-The `goauth` package supports various popular OAuth2 providers. For each provider, you will need to provide the following information:
-
-- `DisplayName`: The official name of the provider.
-- `ClientId`: The application ID for the provider's client.
-- `ClientSecret`: The application secret for the provider's client.
-- `RedirectUrl`: The URL to redirect to after completing the OAuth flow.
-- `AuthUrl`: The URL of the OAuth2 authorization service.
-- `TokenUrl`: The URL of the token exchange service.
-- `UserApiUrl`: The API URL used to fetch user information.
-- `Scopes`: The access permissions you want to request.
-- `Pkce`: Whether the provider supports the PKCE flow.
-
-
-## Contribution
-If you want to contribute to improving `goauth` or adding new providers, please open an issue or submit a pull request.
-
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## License
+
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
