@@ -4,13 +4,13 @@ import (
 	"log"
 	"net/http"
 
-	provider "github.com/mstgnz/goauth"
+	"github.com/mstgnz/goauth"
 	"github.com/mstgnz/goauth/initialize"
 	"golang.org/x/oauth2"
 )
 
 var err error
-var provide provider.Provider
+var provide goauth.Provider
 
 func main() {
 
