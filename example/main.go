@@ -9,7 +9,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var err error
 var provide goauth.Provider
 
 func main() {
