@@ -9,7 +9,6 @@ import (
 
 	"github.com/mstgnz/goauth/config"
 	"github.com/mstgnz/goauth/provider"
-
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )

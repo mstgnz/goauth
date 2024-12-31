@@ -1,3 +1,4 @@
+// Package provider defines the base interfaces and types for OAuth2 providers.
 package provider
 
 import (
@@ -9,7 +10,7 @@ import (
 // provider.BaseProvider implements common functionality for all providers
 type BaseProvider struct{}
 
-// ValidateConfig implements the common validation logic for all providers
+// ValidateConfig implements the common validation logic for all providers.
 func (b *BaseProvider) ValidateConfig(clientId, clientSecret, redirectUrl string) error {
 	if clientId == "" {
 		return errors.New("client ID is required")
@@ -23,7 +24,7 @@ func (b *BaseProvider) ValidateConfig(clientId, clientSecret, redirectUrl string
 	return nil
 }
 
-// RefreshTokenNotSupported returns a standard error for providers that don't support token refresh
+// RefreshTokenNotSupported returns a standard error for providers that don't support token refresh.
 func (b *BaseProvider) RefreshTokenNotSupported() (*oauth2.Token, error) {
 	return nil, errors.New("refresh token is not supported by this provider")
 }
