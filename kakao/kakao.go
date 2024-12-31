@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/kakao"
@@ -19,7 +18,7 @@ import (
 
 // kakaoProvider allows authentication via kakaoProvider OAuth2.
 type kakaoProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -28,7 +27,7 @@ type kakaoProvider struct {
 
 // NewKakaoProvider creates a new kakaoProvider provider instance with some defaults.
 func NewKakaoProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Kakao",
 		ClientId:     "",
@@ -52,7 +51,7 @@ func NewKakaoProvider() goauth.Provider {
 
 // FetchUser returns a Credential instance based on the kakaoProvider user api.
 // API reference: https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#req-user-info-response
-func (p *kakaoProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *kakaoProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -79,7 +78,7 @@ func (p *kakaoProvider) FetchUser(token *oauth2.Token) (*config.Credential, erro
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           strconv.Itoa(extracted.Id),
 		Username:     extracted.Profile.Nickname,
 		AvatarUrl:    extracted.Profile.ImageUrl,

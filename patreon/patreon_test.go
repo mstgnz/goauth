@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mstgnz/goauth/config"
+	"github.com/mstgnz/goauth"
 	"golang.org/x/oauth2"
 )
 
@@ -60,7 +60,7 @@ func TestPatreonProvider_ValidateConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := &patreonProvider{
-				OAuth2Config: &config.OAuth2Config{
+				OAuth2Config: &goauth.OAuth2Config{
 					ClientId:     tt.clientId,
 					ClientSecret: tt.clientSecret,
 					RedirectUrl:  tt.redirectUrl,
@@ -122,7 +122,7 @@ func TestPatreonProvider_FetchUser(t *testing.T) {
 	defer server.Close()
 
 	provider := &patreonProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			UserApiUrl: server.URL + "/api/oauth2/v2/identity",
 			Ctx:        context.Background(),
 		},
@@ -188,7 +188,7 @@ func TestPatreonProvider_RefreshToken(t *testing.T) {
 	defer server.Close()
 
 	provider := &patreonProvider{
-		OAuth2Config: &config.OAuth2Config{},
+		OAuth2Config: &goauth.OAuth2Config{},
 		clientId:     "test-client-id",
 		clientSecret: "test-client-secret",
 		tokenUrl:     server.URL,

@@ -6,19 +6,18 @@ import (
 	"errors"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
 // googleProvider allows authentication via googleProvider OAuth2.
 type googleProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 }
 
 // NewGoogleProvider creates new googleProvider provider instance with some defaults.
 func NewGoogleProvider() goauth.Provider {
-	return &googleProvider{&config.OAuth2Config{
+	return &googleProvider{&goauth.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "googleProvider",
 		AuthUrl:     "https://accounts.google.com/o/oauth2/auth",
@@ -33,7 +32,7 @@ func NewGoogleProvider() goauth.Provider {
 }
 
 // FetchUser returns a Credential instance based the googleProvider's user api.
-func (p *googleProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *googleProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -55,7 +54,7 @@ func (p *googleProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         extracted.Name,
 		AvatarUrl:    extracted.Picture,

@@ -7,21 +7,20 @@ import (
 	"net/http"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 // twitchProvider allows authentication via Twitch OAuth2.
 type twitchProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewTwitchProvider creates new Twitch provider instance with some defaults.
 func NewTwitchProvider() goauth.Provider {
 	return &twitchProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Twitch",
 			AuthUrl:     "https://id.twitch.tv/oauth2/authorize",
@@ -58,7 +57,7 @@ func (p *twitchProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error
 
 // FetchUser returns a Credential instance based the twitchProvider's user api.
 // API reference: https://dev.twitch.tv/docs/api/reference#get-users
-func (p *twitchProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *twitchProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -86,7 +85,7 @@ func (p *twitchProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, errors.New("failed to fetch Credential data")
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Data[0].Id,
 		Name:         extracted.Data[0].DisplayName,
 		Username:     extracted.Data[0].Login,

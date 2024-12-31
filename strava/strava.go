@@ -11,13 +11,12 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 type stravaProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -25,7 +24,7 @@ type stravaProvider struct {
 }
 
 func NewStravaProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Strava",
 		ClientId:     "",
@@ -47,7 +46,7 @@ func NewStravaProvider() goauth.Provider {
 	}
 }
 
-func (p *stravaProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *stravaProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -66,7 +65,7 @@ func (p *stravaProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:        strconv.Itoa(response.Id),
 		Name:      response.FirstName + " " + response.LastName,
 		Username:  response.Username,

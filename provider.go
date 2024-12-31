@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 )
 
@@ -86,7 +85,7 @@ type Provider interface {
 	FetchRawData(token *oauth2.Token) ([]byte, error)
 
 	// FetchUser is similar to FetchRawData but normalizes and marshals the user API response into a standardized Credential struct.
-	FetchUser(token *oauth2.Token) (user *config.Credential, err error)
+	FetchUser(token *oauth2.Token) (user *Credential, err error)
 
 	// ValidateConfig validates the provider configuration.
 	ValidateConfig() error

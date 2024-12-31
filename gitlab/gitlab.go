@@ -7,21 +7,20 @@ import (
 	"strconv"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 // gitlabProvider allows authentication via gitlabProvider OAuth2.
 type gitlabProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewGitlabProvider creates new gitlabProvider provider instance with some defaults.
 func NewGitlabProvider() goauth.Provider {
 	return &gitlabProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "GitLab",
 			AuthUrl:     "https://gitlab.com/oauth/authorize",
@@ -58,7 +57,7 @@ func (p *gitlabProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error
 
 // FetchUser returns a Credential instance based the gitlabProvider user api.
 // API reference: https://docs.gitlab.com/ee/api/users.html#for-admin
-func (p *gitlabProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *gitlabProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -80,7 +79,7 @@ func (p *gitlabProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           strconv.Itoa(extracted.Id),
 		Name:         extracted.Name,
 		Username:     extracted.Username,

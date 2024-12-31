@@ -11,13 +11,12 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 type xProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -25,7 +24,7 @@ type xProvider struct {
 }
 
 func NewXProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "X (Twitter)",
 		ClientId:     "",
@@ -47,7 +46,7 @@ func NewXProvider() goauth.Provider {
 	}
 }
 
-func (p *xProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *xProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -65,7 +64,7 @@ func (p *xProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:       response.Data.Id,
 		Name:     response.Data.Name,
 		Username: response.Data.Username,

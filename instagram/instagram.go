@@ -5,21 +5,20 @@ import (
 	"encoding/json"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 // instagramProvider allows authentication via Instagram OAuth2.
 type instagramProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewInstagramProvider creates new Instagram provider instance with some defaults.
 func NewInstagramProvider() goauth.Provider {
 	return &instagramProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Instagram",
 			AuthUrl:     "https://api.instagram.com/oauth/authorize",
@@ -44,7 +43,7 @@ func (p *instagramProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, er
 
 // FetchUser returns a Credential instance based on the Instagram's user api.
 // API reference: https://developers.facebook.com/docs/instagram-basic-display-api/reference/user#fields
-func (p *instagramProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *instagramProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func (p *instagramProvider) FetchUser(token *oauth2.Token) (*config.Credential, 
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Username:     extracted.Username,
 		RawUser:      rawUser,

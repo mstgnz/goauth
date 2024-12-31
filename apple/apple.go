@@ -15,7 +15,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"github.com/spf13/cast"
 	"golang.org/x/oauth2"
 )
@@ -23,7 +22,7 @@ import (
 // appleProvider allows authentication via Apple OAuth2.
 // [OIDC differences]: https://bitbucket.org/openid/connect/src/master/How-Sign-in-with-Apple-differs-from-OpenID-Connect.md
 type appleProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 	jwkUrl string
 }
@@ -31,7 +30,7 @@ type appleProvider struct {
 // NewAppleProvider creates a new Apple provider instance with some defaults.
 func NewAppleProvider() goauth.Provider {
 	return &appleProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Apple",
 			AuthUrl:     "https://appleid.apple.com/auth/authorize",
@@ -81,7 +80,7 @@ func (p *appleProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error)
 
 // FetchUser returns a Credential instance based on the provided token.
 // API reference: https://developer.apple.com/documentation/sign_in_with_apple/tokenresponse.
-func (p *appleProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *appleProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func (p *appleProvider) FetchUser(token *oauth2.Token) (*config.Credential, erro
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,

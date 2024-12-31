@@ -11,14 +11,13 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/vk"
 )
 
 type vkProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -26,7 +25,7 @@ type vkProvider struct {
 }
 
 func NewVkProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "VK",
 		ClientId:     "",
@@ -48,7 +47,7 @@ func NewVkProvider() goauth.Provider {
 	}
 }
 
-func (p *vkProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *vkProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -73,7 +72,7 @@ func (p *vkProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) 
 	}
 
 	userData := response.Response[0]
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:        strconv.Itoa(userData.Id),
 		Name:      userData.FirstName + " " + userData.LastName,
 		Email:     userData.Email,

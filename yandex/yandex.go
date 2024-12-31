@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/yandex"
@@ -14,13 +13,13 @@ import (
 
 // yandexProvider allows authentication via yandexProvider OAuth2.
 type yandexProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 }
 
 // NewYandexProvider creates new yandexProvider provider instance with some defaults.
 // Docs: https://yandex.ru/dev/id/doc/en/
 func NewYandexProvider() goauth.Provider {
-	return &yandexProvider{&config.OAuth2Config{
+	return &yandexProvider{&goauth.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "yandexProvider",
 		AuthUrl:     yandex.Endpoint.AuthURL,
@@ -33,7 +32,7 @@ func NewYandexProvider() goauth.Provider {
 
 // FetchUser returns a Credential instance based on yandexProvider's user api.
 // API reference: https://yandex.ru/dev/id/doc/en/user-information#response-format
-func (p *yandexProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *yandexProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -56,7 +55,7 @@ func (p *yandexProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         extracted.Name,
 		Username:     extracted.Username,

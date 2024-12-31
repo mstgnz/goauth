@@ -10,13 +10,12 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 type mailcowProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -24,7 +23,7 @@ type mailcowProvider struct {
 }
 
 func NewMailcowProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Mailcow",
 		ClientId:     "",
@@ -46,7 +45,7 @@ func NewMailcowProvider() goauth.Provider {
 	}
 }
 
-func (p *mailcowProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *mailcowProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func (p *mailcowProvider) FetchUser(token *oauth2.Token) (*config.Credential, er
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:       response.Id,
 		Username: response.Username,
 		Name:     response.Name,

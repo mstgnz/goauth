@@ -1,4 +1,4 @@
-package config
+package goauth
 
 import (
 	"context"

@@ -6,21 +6,20 @@ import (
 	"errors"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 // microsoftProvider allows authentication via Microsoft OAuth2.
 type microsoftProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewMicrosoftProvider creates new Microsoft provider instance with some defaults.
 func NewMicrosoftProvider() goauth.Provider {
 	return &microsoftProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Microsoft",
 			AuthUrl:     "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
@@ -58,7 +57,7 @@ func (p *microsoftProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, er
 // FetchUser returns a Credential instance based on the microsoftProvider's user api.
 // API reference:  https://learn.microsoft.com/en-us/azure/active-directory/develop/userinfo
 // Graph explorer: https://developer.microsoft.com/en-us/graph/graph-explorer
-func (p *microsoftProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *microsoftProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -78,7 +77,7 @@ func (p *microsoftProvider) FetchUser(token *oauth2.Token) (*config.Credential, 
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         extracted.Name,
 		Email:        extracted.Email,

@@ -5,21 +5,20 @@ import (
 	"encoding/json"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 )
 
 // facebookProvider allows authentication via Facebook OAuth2.
 type facebookProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewFacebookProvider creates new Facebook provider instance with some defaults.
 func NewFacebookProvider() goauth.Provider {
 	return &facebookProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Facebook",
 			AuthUrl:     facebook.Endpoint.AuthURL,
@@ -34,7 +33,7 @@ func NewFacebookProvider() goauth.Provider {
 
 // FetchUser returns a Credential instance based on the facebookProvider's user api.
 // API reference: https://developers.facebook.com/docs/graph-api/reference/user/
-func (p *facebookProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *facebookProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -57,7 +56,7 @@ func (p *facebookProvider) FetchUser(token *oauth2.Token) (*config.Credential, e
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         extracted.Name,
 		Email:        extracted.Email,

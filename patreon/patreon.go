@@ -10,13 +10,12 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 type patreonProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -24,7 +23,7 @@ type patreonProvider struct {
 }
 
 func NewPatreonProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "Patreon",
 		ClientId:     "",
@@ -46,7 +45,7 @@ func NewPatreonProvider() goauth.Provider {
 	}
 }
 
-func (p *patreonProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *patreonProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ func (p *patreonProvider) FetchUser(token *oauth2.Token) (*config.Credential, er
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:        response.Data.Id,
 		Name:      response.Data.Attributes.FullName,
 		Email:     response.Data.Attributes.Email,

@@ -1,4 +1,4 @@
-package config
+package goauth
 
 // Credential defines a standardized OAuth2 user data structure.
 // It represents the information retrieved from the OAuth2 provider's user API.

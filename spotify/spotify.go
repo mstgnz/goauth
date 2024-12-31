@@ -6,21 +6,20 @@ import (
 	"errors"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 // spotifyProvider allows authentication via Spotify OAuth2.
 type spotifyProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewSpotifyProvider creates new Spotify provider instance with some defaults.
 func NewSpotifyProvider() goauth.Provider {
 	return &spotifyProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Spotify",
 			AuthUrl:     "https://accounts.spotify.com/authorize",
@@ -57,7 +56,7 @@ func (p *spotifyProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, erro
 
 // FetchUser returns a Credential instance based on the spotifyProvider's user api.
 // API reference: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-current-users-profile
-func (p *spotifyProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *spotifyProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -83,7 +82,7 @@ func (p *spotifyProvider) FetchUser(token *oauth2.Token) (*config.Credential, er
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         extracted.Name,
 		RawUser:      rawUser,

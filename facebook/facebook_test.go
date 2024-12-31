@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mstgnz/goauth/config"
+	"github.com/mstgnz/goauth"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 )
@@ -149,7 +149,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 		token          *oauth2.Token
 		mockResponse   interface{}
 		wantErr        bool
-		expectedUser   *config.Credential
+		expectedUser   *goauth.Credential
 		mockStatusCode int
 	}{
 		{
@@ -163,7 +163,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 			mockResponse:   mockUserData,
 			mockStatusCode: http.StatusOK,
 			wantErr:        false,
-			expectedUser: &config.Credential{
+			expectedUser: &goauth.Credential{
 				Id:           "123456789",
 				Name:         "Test User",
 				Email:        "test@facebook.com",

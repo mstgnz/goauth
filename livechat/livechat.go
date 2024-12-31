@@ -10,13 +10,12 @@ import (
 	"time"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
 
 type livechatProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	clientId     string
 	clientSecret string
 	redirectUrl  string
@@ -24,7 +23,7 @@ type livechatProvider struct {
 }
 
 func NewLiveChatProvider() goauth.Provider {
-	oauth2Config := &config.OAuth2Config{
+	oauth2Config := &goauth.OAuth2Config{
 		Ctx:          context.Background(),
 		DisplayName:  "LiveChat",
 		ClientId:     "",
@@ -46,7 +45,7 @@ func NewLiveChatProvider() goauth.Provider {
 	}
 }
 
-func (p *livechatProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *livechatProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.OAuth2Config.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -64,7 +63,7 @@ func (p *livechatProvider) FetchUser(token *oauth2.Token) (*config.Credential, e
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:        response.Id,
 		Name:      response.Name,
 		Email:     response.Email,

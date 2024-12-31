@@ -7,20 +7,19 @@ import (
 	"strconv"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 )
 
 // giteaProvider allows authentication via Gitea OAuth2.
 type giteaProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewGiteaProvider creates new Gitea provider instance with some defaults.
 func NewGiteaProvider() goauth.Provider {
 	return &giteaProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Gitea",
 			AuthUrl:     "https://gitea.com/login/oauth/authorize",
@@ -57,7 +56,7 @@ func (p *giteaProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error)
 
 // FetchUser returns a Credential instance based on giteaProvider's user api
 // reference: https://try.gitea.io/api/swagger#/user/userGetCurrent
-func (g *giteaProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (g *giteaProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := g.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -79,7 +78,7 @@ func (g *giteaProvider) FetchUser(token *oauth2.Token) (*config.Credential, erro
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           strconv.Itoa(extracted.Id),
 		Name:         extracted.Name,
 		Username:     extracted.Username,

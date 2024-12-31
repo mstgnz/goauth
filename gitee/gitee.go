@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 
 	"golang.org/x/oauth2"
 )
@@ -23,7 +22,7 @@ func init() {
 
 // giteeProvider allows authentication via Gitee OAuth2.
 type giteeProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 	EmailApiUrl string
 }
@@ -31,7 +30,7 @@ type giteeProvider struct {
 // NewGiteeProvider creates new Gitee provider instance with some defaults.
 func NewGiteeProvider() goauth.Provider {
 	return &giteeProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Gitee",
 			AuthUrl:     "https://gitee.com/oauth/authorize",
@@ -69,7 +68,7 @@ func (p *giteeProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error)
 
 // FetchUser returns a Credential instance based the Gitte's user api.
 // API reference: https://gitee.com/api/v5/swagger#/getV5User
-func (p *giteeProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *giteeProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -91,7 +90,7 @@ func (p *giteeProvider) FetchUser(token *oauth2.Token) (*config.Credential, erro
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           strconv.Itoa(extracted.Id),
 		Name:         extracted.Name,
 		Username:     extracted.Login,

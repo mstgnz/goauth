@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mstgnz/goauth/config"
+	"github.com/mstgnz/goauth"
 	"golang.org/x/oauth2"
 )
 
@@ -60,7 +60,7 @@ func TestVkProvider_ValidateConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := &vkProvider{
-				OAuth2Config: &config.OAuth2Config{
+				OAuth2Config: &goauth.OAuth2Config{
 					ClientId:     tt.clientId,
 					ClientSecret: tt.clientSecret,
 					RedirectUrl:  tt.redirectUrl,
@@ -117,7 +117,7 @@ func TestVkProvider_FetchUser(t *testing.T) {
 	defer server.Close()
 
 	provider := &vkProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			UserApiUrl: server.URL + "/method/users.get",
 			Ctx:        context.Background(),
 		},
@@ -175,7 +175,7 @@ func TestVkProvider_FetchUser_EmptyResponse(t *testing.T) {
 	defer server.Close()
 
 	provider := &vkProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			UserApiUrl: server.URL + "/method/users.get",
 			Ctx:        context.Background(),
 		},
@@ -231,7 +231,7 @@ func TestVkProvider_RefreshToken(t *testing.T) {
 	defer server.Close()
 
 	provider := &vkProvider{
-		OAuth2Config: &config.OAuth2Config{},
+		OAuth2Config: &goauth.OAuth2Config{},
 		clientId:     "test-client-id",
 		clientSecret: "test-client-secret",
 		tokenUrl:     server.URL,

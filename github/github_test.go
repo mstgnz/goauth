@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mstgnz/goauth/config"
+	"github.com/mstgnz/goauth"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -173,7 +173,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 		userStatus     int
 		emailStatus    int
 		wantErr        bool
-		expectedUser   *config.Credential
+		expectedUser   *goauth.Credential
 		checkEmailCall bool
 	}{
 		{
@@ -190,7 +190,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 			emailStatus:    http.StatusOK,
 			wantErr:        false,
 			checkEmailCall: false,
-			expectedUser: &config.Credential{
+			expectedUser: &goauth.Credential{
 				Id:           "123456789",
 				Name:         "Test User",
 				Username:     "testuser",
@@ -220,7 +220,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 			emailStatus:    http.StatusOK,
 			wantErr:        false,
 			checkEmailCall: true,
-			expectedUser: &config.Credential{
+			expectedUser: &goauth.Credential{
 				Id:           "123456789",
 				Name:         "Test User",
 				Username:     "testuser",
@@ -249,7 +249,7 @@ func TestFetchUser_WithMockServer(t *testing.T) {
 			emailStatus:    http.StatusUnauthorized,
 			wantErr:        false,
 			checkEmailCall: true,
-			expectedUser: &config.Credential{
+			expectedUser: &goauth.Credential{
 				Id:        "123456789",
 				Name:      "Test User",
 				Username:  "testuser",

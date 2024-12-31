@@ -7,20 +7,19 @@ import (
 	"fmt"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 )
 
 // discordProvider allows authentication via Discord OAuth2.
 type discordProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 	goauth.BaseProvider
 }
 
 // NewDiscordProvider creates new Discord provider instance with some defaults.
 func NewDiscordProvider() goauth.Provider {
 	return &discordProvider{
-		OAuth2Config: &config.OAuth2Config{
+		OAuth2Config: &goauth.OAuth2Config{
 			Ctx:         context.Background(),
 			DisplayName: "Discord",
 			AuthUrl:     "https://discord.com/api/oauth2/authorize",
@@ -57,7 +56,7 @@ func (p *discordProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, erro
 
 // FetchUser returns a Credential instance from discordProvider's user api.
 // API reference:  https://discord.com/developers/docs/resources/user#user-object
-func (p *discordProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *discordProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -87,7 +86,7 @@ func (p *discordProvider) FetchUser(token *oauth2.Token) (*config.Credential, er
 	// Concatenate the user's username and discriminator into a single username string
 	username := fmt.Sprintf("%s#%s", extracted.Username, extracted.Discriminator)
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           extracted.Id,
 		Name:         username,
 		Username:     extracted.Username,

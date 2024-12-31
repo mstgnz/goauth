@@ -8,19 +8,18 @@ import (
 	"strconv"
 
 	"github.com/mstgnz/goauth"
-	"github.com/mstgnz/goauth/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
 
 // gitHubProvider allows authentication via gitHubProvider OAuth2.
 type gitHubProvider struct {
-	*config.OAuth2Config
+	*goauth.OAuth2Config
 }
 
 // NewGithubProvider creates new gitHubProvider provider instance with some defaults.
 func NewGithubProvider() goauth.Provider {
-	return &gitHubProvider{&config.OAuth2Config{
+	return &gitHubProvider{&goauth.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "GitHub",
 		AuthUrl:     github.Endpoint.AuthURL,
@@ -33,7 +32,7 @@ func NewGithubProvider() goauth.Provider {
 
 // FetchUser returns a Credential instance based the gitHubProvider's user api.
 // API reference: https://docs.github.com/en/rest/reference/users#get-the-authenticated-user
-func (p *gitHubProvider) FetchUser(token *oauth2.Token) (*config.Credential, error) {
+func (p *gitHubProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) {
 	data, err := p.FetchRawData(token)
 	if err != nil {
 		return nil, err
@@ -55,7 +54,7 @@ func (p *gitHubProvider) FetchUser(token *oauth2.Token) (*config.Credential, err
 		return nil, err
 	}
 
-	user := &config.Credential{
+	user := &goauth.Credential{
 		Id:           strconv.Itoa(extracted.Id),
 		Name:         extracted.Name,
 		Username:     extracted.Login,
