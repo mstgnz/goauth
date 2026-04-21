@@ -15,11 +15,12 @@ import (
 // gitHubProvider allows authentication via gitHubProvider OAuth2.
 type gitHubProvider struct {
 	*goauth.OAuth2Config
+	goauth.BaseProvider
 }
 
 // NewGithubProvider creates new gitHubProvider provider instance with some defaults.
 func NewGithubProvider() goauth.Provider {
-	return &gitHubProvider{&goauth.OAuth2Config{
+	return &gitHubProvider{OAuth2Config: &goauth.OAuth2Config{
 		Ctx:         context.Background(),
 		DisplayName: "GitHub",
 		AuthUrl:     github.Endpoint.AuthURL,
@@ -63,6 +64,7 @@ func (p *gitHubProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, err
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	// in case user has set "Keep my email address private", send an
@@ -132,14 +134,5 @@ func (p *gitHubProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error
 
 // ValidateConfig validates the provider configuration.
 func (p *gitHubProvider) ValidateConfig() error {
-	if p.GetClientId() == "" {
-		return errors.New("client ID is required")
-	}
-	if p.GetClientSecret() == "" {
-		return errors.New("client secret is required")
-	}
-	if p.GetRedirectUrl() == "" {
-		return errors.New("redirect URL is required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }

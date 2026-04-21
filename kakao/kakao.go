@@ -4,11 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/mstgnz/goauth"
 
@@ -19,33 +15,22 @@ import (
 // kakaoProvider allows authentication via kakaoProvider OAuth2.
 type kakaoProvider struct {
 	*goauth.OAuth2Config
-	clientId     string
-	clientSecret string
-	redirectUrl  string
-	tokenUrl     string
+	goauth.BaseProvider
 }
 
 // NewKakaoProvider creates a new kakaoProvider provider instance with some defaults.
 func NewKakaoProvider() goauth.Provider {
-	oauth2Config := &goauth.OAuth2Config{
-		Ctx:          context.Background(),
-		DisplayName:  "Kakao",
-		ClientId:     "",
-		ClientSecret: "",
-		RedirectUrl:  "",
-		AuthUrl:      kakao.Endpoint.AuthURL,
-		TokenUrl:     kakao.Endpoint.TokenURL,
-		UserApiUrl:   "https://kapi.kakao.com/v2/user/me",
-		Scopes:       []string{"profile_nickname", "profile_image", "account_email"},
-		Pkce:         true,
-	}
-
 	return &kakaoProvider{
-		OAuth2Config: oauth2Config,
-		clientId:     oauth2Config.ClientId,
-		clientSecret: oauth2Config.ClientSecret,
-		redirectUrl:  oauth2Config.RedirectUrl,
-		tokenUrl:     oauth2Config.TokenUrl,
+		OAuth2Config: &goauth.OAuth2Config{
+			Ctx:         context.Background(),
+			DisplayName: "Kakao",
+			AuthUrl:     kakao.Endpoint.AuthURL,
+			TokenUrl:    kakao.Endpoint.TokenURL,
+			UserApiUrl:  "https://kapi.kakao.com/v2/user/me",
+			Scopes:      []string{"profile_nickname", "profile_image", "account_email"},
+			Pkce:        true,
+		},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 
@@ -85,6 +70,7 @@ func (p *kakaoProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, erro
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if extracted.KakaoAccount.IsEmailValid && extracted.KakaoAccount.IsEmailVerified {
@@ -95,10 +81,7 @@ func (p *kakaoProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, erro
 }
 
 func (p *kakaoProvider) ValidateConfig() error {
-	if p.clientId == "" || p.clientSecret == "" || p.redirectUrl == "" {
-		return errors.New("client id, client secret and redirect url are required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }
 
 func (p *kakaoProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error) {
@@ -106,49 +89,13 @@ func (p *kakaoProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error)
 		return nil, errors.New("refresh token is required")
 	}
 
-	data := url.Values{}
-	data.Set("grant_type", "refresh_token")
-	data.Set("refresh_token", token.RefreshToken)
-	data.Set("client_id", p.clientId)
-	data.Set("client_secret", p.clientSecret)
-
-	req, err := http.NewRequest("POST", p.tokenUrl, strings.NewReader(data.Encode()))
-	if err != nil {
-		return nil, err
+	config := &oauth2.Config{
+		ClientID:     p.GetClientId(),
+		ClientSecret: p.GetClientSecret(),
+		Endpoint: oauth2.Endpoint{
+			TokenURL: p.GetTokenUrl(),
+		},
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		var errorResponse struct {
-			Error            string `json:"error"`
-			ErrorDescription string `json:"error_description"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
-			return nil, err
-		}
-		return nil, errors.New(errorResponse.ErrorDescription)
-	}
-
-	var result struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return &oauth2.Token{
-		AccessToken: result.AccessToken,
-		TokenType:   result.TokenType,
-		Expiry:      time.Now().Add(time.Duration(result.ExpiresIn) * time.Second),
-	}, nil
+	return config.TokenSource(p.GetContext(), token).Token()
 }

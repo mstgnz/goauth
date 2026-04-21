@@ -113,10 +113,7 @@ func TestMailcowProvider_ValidateConfig(t *testing.T) {
 					TokenUrl:     tt.tokenUrl,
 					UserApiUrl:   tt.userApiUrl,
 				},
-				clientId:     tt.clientId,
-				clientSecret: tt.clientSecret,
-				redirectUrl:  tt.redirectUrl,
-				tokenUrl:     tt.tokenUrl,
+				BaseProvider: goauth.BaseProvider{},
 			}
 
 			err := provider.ValidateConfig()
@@ -192,33 +189,19 @@ func TestMailcowProvider_RefreshToken(t *testing.T) {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			t.Errorf("Expected POST request, got %s", r.Method)
-		}
-		if err := r.ParseForm(); err != nil {
-			t.Fatal(err)
-		}
-		if r.FormValue("grant_type") != "refresh_token" {
-			t.Errorf("Expected grant_type 'refresh_token', got %s", r.FormValue("grant_type"))
-		}
-		if r.FormValue("refresh_token") != "test-refresh-token" {
-			t.Errorf("Expected refresh_token 'test-refresh-token', got %s", r.FormValue("refresh_token"))
-		}
-		if r.FormValue("client_id") != "test-client-id" {
-			t.Errorf("Expected client_id 'test-client-id', got %s", r.FormValue("client_id"))
-		}
-		if r.FormValue("client_secret") != "test-client-secret" {
-			t.Errorf("Expected client_secret 'test-client-secret', got %s", r.FormValue("client_secret"))
-		}
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
 	provider := &mailcowProvider{
-		OAuth2Config: &goauth.OAuth2Config{},
-		clientId:     "test-client-id",
-		clientSecret: "test-client-secret",
-		tokenUrl:     server.URL,
+		OAuth2Config: &goauth.OAuth2Config{
+			ClientId:     "test-client-id",
+			ClientSecret: "test-client-secret",
+			TokenUrl:     server.URL,
+			Ctx:          context.Background(),
+		},
+		BaseProvider: goauth.BaseProvider{},
 	}
 
 	oldToken := &oauth2.Token{

@@ -64,6 +64,7 @@ func (p *facebookProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, e
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	return user, nil

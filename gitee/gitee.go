@@ -98,6 +98,7 @@ func (p *giteeProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, erro
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if extracted.Email != "" && validate.Var(extracted.Email, "required,email") == nil {

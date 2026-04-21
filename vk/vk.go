@@ -4,11 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/mstgnz/goauth"
 
@@ -18,32 +14,21 @@ import (
 
 type vkProvider struct {
 	*goauth.OAuth2Config
-	clientId     string
-	clientSecret string
-	redirectUrl  string
-	tokenUrl     string
+	goauth.BaseProvider
 }
 
 func NewVkProvider() goauth.Provider {
-	oauth2Config := &goauth.OAuth2Config{
-		Ctx:          context.Background(),
-		DisplayName:  "VK",
-		ClientId:     "",
-		ClientSecret: "",
-		RedirectUrl:  "",
-		AuthUrl:      vk.Endpoint.AuthURL,
-		TokenUrl:     vk.Endpoint.TokenURL,
-		UserApiUrl:   "https://api.vk.com/method/users.get",
-		Scopes:       []string{"email"},
-		Pkce:         true,
-	}
-
 	return &vkProvider{
-		OAuth2Config: oauth2Config,
-		clientId:     oauth2Config.ClientId,
-		clientSecret: oauth2Config.ClientSecret,
-		redirectUrl:  oauth2Config.RedirectUrl,
-		tokenUrl:     oauth2Config.TokenUrl,
+		OAuth2Config: &goauth.OAuth2Config{
+			Ctx:         context.Background(),
+			DisplayName: "VK",
+			AuthUrl:     vk.Endpoint.AuthURL,
+			TokenUrl:    vk.Endpoint.TokenURL,
+			UserApiUrl:  "https://api.vk.com/method/users.get",
+			Scopes:      []string{"email"},
+			Pkce:        true,
+		},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 
@@ -53,7 +38,12 @@ func (p *vkProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) 
 		return nil, err
 	}
 
-	var response struct {
+	rawUser := map[string]any{}
+	if err = json.Unmarshal(data, &rawUser); err != nil {
+		return nil, err
+	}
+
+	extracted := struct {
 		Response []struct {
 			Id        int    `json:"id"`
 			FirstName string `json:"first_name"`
@@ -61,32 +51,32 @@ func (p *vkProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, error) 
 			Photo     string `json:"photo_200"`
 			Email     string `json:"email"`
 		} `json:"response"`
-	}
-
-	if err := json.Unmarshal(data, &response); err != nil {
+	}{}
+	if err = json.Unmarshal(data, &extracted); err != nil {
 		return nil, err
 	}
 
-	if len(response.Response) == 0 {
+	if len(extracted.Response) == 0 {
 		return nil, errors.New("no user data returned from VK")
 	}
 
-	userData := response.Response[0]
+	userData := extracted.Response[0]
 	user := &goauth.Credential{
-		Id:        strconv.Itoa(userData.Id),
-		Name:      userData.FirstName + " " + userData.LastName,
-		Email:     userData.Email,
-		AvatarUrl: userData.Photo,
+		Id:           strconv.Itoa(userData.Id),
+		Name:         userData.FirstName + " " + userData.LastName,
+		Email:        userData.Email,
+		AvatarUrl:    userData.Photo,
+		RawUser:      rawUser,
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	return user, nil
 }
 
 func (p *vkProvider) ValidateConfig() error {
-	if p.clientId == "" || p.clientSecret == "" || p.redirectUrl == "" {
-		return errors.New("client id, client secret and redirect url are required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }
 
 func (p *vkProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error) {
@@ -94,38 +84,14 @@ func (p *vkProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error) {
 		return nil, errors.New("refresh token is required")
 	}
 
-	data := url.Values{}
-	data.Set("grant_type", "refresh_token")
-	data.Set("refresh_token", token.RefreshToken)
-	data.Set("client_id", p.clientId)
-	data.Set("client_secret", p.clientSecret)
-
-	req, err := http.NewRequest("POST", p.tokenUrl, strings.NewReader(data.Encode()))
-	if err != nil {
-		return nil, err
+	config := &oauth2.Config{
+		ClientID:     p.GetClientId(),
+		ClientSecret: p.GetClientSecret(),
+		Endpoint: oauth2.Endpoint{
+			TokenURL:  p.GetTokenUrl(),
+			AuthStyle: oauth2.AuthStyleInParams,
+		},
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var result struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return &oauth2.Token{
-		AccessToken: result.AccessToken,
-		TokenType:   result.TokenType,
-		Expiry:      time.Now().Add(time.Duration(result.ExpiresIn) * time.Second),
-	}, nil
+	return config.TokenSource(p.GetContext(), token).Token()
 }

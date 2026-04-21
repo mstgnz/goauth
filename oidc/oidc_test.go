@@ -79,7 +79,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			tokenURL:     "https://example.com/oauth2/token",
 			userAPIURL:   "https://example.com/oauth2/userinfo",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client ID is required",
 		},
 		{
 			name:         "Empty client secret",
@@ -90,7 +90,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			tokenURL:     "https://example.com/oauth2/token",
 			userAPIURL:   "https://example.com/oauth2/userinfo",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client secret is required",
 		},
 		{
 			name:         "Empty redirect URL",
@@ -101,7 +101,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			tokenURL:     "https://example.com/oauth2/token",
 			userAPIURL:   "https://example.com/oauth2/userinfo",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "redirect URL is required",
 		},
 		{
 			name:         "Empty auth URL",
@@ -153,9 +153,9 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := NewOidcProvider()
 			oidcProvider := provider.(*oidcProvider)
-			oidcProvider.clientId = tt.clientID
-			oidcProvider.clientSecret = tt.clientSecret
-			oidcProvider.redirectUrl = tt.redirectURL
+			oidcProvider.SetClientId(tt.clientID)
+			oidcProvider.SetClientSecret(tt.clientSecret)
+			oidcProvider.SetRedirectUrl(tt.redirectURL)
 			oidcProvider.AuthUrl = tt.authURL
 			oidcProvider.TokenUrl = tt.tokenURL
 			oidcProvider.UserApiUrl = tt.userAPIURL
@@ -366,9 +366,9 @@ func TestRefreshToken_WithMockServer(t *testing.T) {
 
 			provider := NewOidcProvider()
 			oidcProvider := provider.(*oidcProvider)
-			oidcProvider.tokenUrl = server.URL
-			oidcProvider.clientId = tt.clientID
-			oidcProvider.clientSecret = tt.clientSecret
+			oidcProvider.SetTokenUrl(server.URL)
+			oidcProvider.SetClientId(tt.clientID)
+			oidcProvider.SetClientSecret(tt.clientSecret)
 
 			newToken, err := oidcProvider.RefreshToken(tt.token)
 			if (err != nil) != tt.wantErr {

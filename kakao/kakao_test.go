@@ -92,7 +92,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "test-secret",
 			redirectURL:  "http://localhost:8080/callback",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client ID is required",
 		},
 		{
 			name:         "Empty client secret",
@@ -100,7 +100,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "",
 			redirectURL:  "http://localhost:8080/callback",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client secret is required",
 		},
 		{
 			name:         "Empty redirect URL",
@@ -108,7 +108,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "test-secret",
 			redirectURL:  "",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "redirect URL is required",
 		},
 		{
 			name:         "Valid configuration",
@@ -124,9 +124,9 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := NewKakaoProvider()
 			kakaoProvider := provider.(*kakaoProvider)
-			kakaoProvider.clientId = tt.clientID
-			kakaoProvider.clientSecret = tt.clientSecret
-			kakaoProvider.redirectUrl = tt.redirectURL
+			kakaoProvider.SetClientId(tt.clientID)
+			kakaoProvider.SetClientSecret(tt.clientSecret)
+			kakaoProvider.SetRedirectUrl(tt.redirectURL)
 
 			err := kakaoProvider.ValidateConfig()
 			if (err != nil) != tt.wantErr {
@@ -342,9 +342,9 @@ func TestRefreshToken_WithMockServer(t *testing.T) {
 
 			provider := NewKakaoProvider()
 			kakaoProvider := provider.(*kakaoProvider)
-			kakaoProvider.tokenUrl = server.URL
-			kakaoProvider.clientId = tt.clientID
-			kakaoProvider.clientSecret = tt.clientSecret
+			kakaoProvider.SetTokenUrl(server.URL)
+			kakaoProvider.SetClientId(tt.clientID)
+			kakaoProvider.SetClientSecret(tt.clientSecret)
 
 			newToken, err := kakaoProvider.RefreshToken(tt.token)
 			if (err != nil) != tt.wantErr {

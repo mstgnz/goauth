@@ -87,6 +87,7 @@ func (g *giteaProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, erro
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	return user, nil

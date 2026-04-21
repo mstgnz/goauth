@@ -14,14 +14,15 @@ import (
 // yandexProvider allows authentication via yandexProvider OAuth2.
 type yandexProvider struct {
 	*goauth.OAuth2Config
+	goauth.BaseProvider
 }
 
 // NewYandexProvider creates new yandexProvider provider instance with some defaults.
 // Docs: https://yandex.ru/dev/id/doc/en/
 func NewYandexProvider() goauth.Provider {
-	return &yandexProvider{&goauth.OAuth2Config{
+	return &yandexProvider{OAuth2Config: &goauth.OAuth2Config{
 		Ctx:         context.Background(),
-		DisplayName: "yandexProvider",
+		DisplayName: "Yandex",
 		AuthUrl:     yandex.Endpoint.AuthURL,
 		TokenUrl:    yandex.Endpoint.TokenURL,
 		UserApiUrl:  "https://login.yandex.ru/info",
@@ -63,6 +64,7 @@ func (p *yandexProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, err
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if !extracted.IsAvatarEmpty {
@@ -91,14 +93,5 @@ func (p *yandexProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error
 
 // ValidateConfig validates the provider configuration.
 func (p *yandexProvider) ValidateConfig() error {
-	if p.GetClientId() == "" {
-		return errors.New("client ID is required")
-	}
-	if p.GetClientSecret() == "" {
-		return errors.New("client secret is required")
-	}
-	if p.GetRedirectUrl() == "" {
-		return errors.New("redirect URL is required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }

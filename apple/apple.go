@@ -105,6 +105,7 @@ func (p *appleProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, erro
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if cast.ToBool(extracted.EmailVerified) {

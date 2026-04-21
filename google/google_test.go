@@ -23,7 +23,7 @@ func TestNewGoogleProvider_TableDriven(t *testing.T) {
 	}{
 		{
 			name:          "Default provider creation",
-			wantName:      "googleProvider",
+			wantName:      "Google",
 			wantAuthUrl:   "https://accounts.google.com/o/oauth2/auth",
 			wantTokenUrl:  "https://accounts.google.com/o/oauth2/token",
 			wantUserApi:   "https://www.googleapis.com/oauth2/v1/userinfo",

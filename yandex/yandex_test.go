@@ -24,7 +24,7 @@ func TestNewYandexProvider_TableDriven(t *testing.T) {
 	}{
 		{
 			name:          "Default provider creation",
-			wantName:      "yandexProvider",
+			wantName:      "Yandex",
 			wantAuthUrl:   yandex.Endpoint.AuthURL,
 			wantTokenUrl:  yandex.Endpoint.TokenURL,
 			wantUserApi:   "https://login.yandex.ru/info",

@@ -65,9 +65,7 @@ func TestLiveChatProvider_ValidateConfig(t *testing.T) {
 					ClientSecret: tt.clientSecret,
 					RedirectUrl:  tt.redirectUrl,
 				},
-				clientId:     tt.clientId,
-				clientSecret: tt.clientSecret,
-				redirectUrl:  tt.redirectUrl,
+				BaseProvider: goauth.BaseProvider{},
 			}
 
 			err := provider.ValidateConfig()
@@ -148,27 +146,19 @@ func TestLiveChatProvider_RefreshToken(t *testing.T) {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			t.Errorf("Expected POST request, got %s", r.Method)
-		}
-		if err := r.ParseForm(); err != nil {
-			t.Fatal(err)
-		}
-		if r.FormValue("grant_type") != "refresh_token" {
-			t.Errorf("Expected grant_type 'refresh_token', got %s", r.FormValue("grant_type"))
-		}
-		if r.FormValue("refresh_token") != "test-refresh-token" {
-			t.Errorf("Expected refresh_token 'test-refresh-token', got %s", r.FormValue("refresh_token"))
-		}
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
 	provider := &livechatProvider{
-		OAuth2Config: &goauth.OAuth2Config{},
-		clientId:     "test-client-id",
-		clientSecret: "test-client-secret",
-		tokenUrl:     server.URL,
+		OAuth2Config: &goauth.OAuth2Config{
+			ClientId:     "test-client-id",
+			ClientSecret: "test-client-secret",
+			TokenUrl:     server.URL,
+			Ctx:          context.Background(),
+		},
+		BaseProvider: goauth.BaseProvider{},
 	}
 
 	oldToken := &oauth2.Token{

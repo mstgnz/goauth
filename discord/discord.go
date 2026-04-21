@@ -94,6 +94,7 @@ func (p *discordProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, er
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if extracted.Verified {

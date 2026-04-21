@@ -13,13 +13,14 @@ import (
 // googleProvider allows authentication via googleProvider OAuth2.
 type googleProvider struct {
 	*goauth.OAuth2Config
+	goauth.BaseProvider
 }
 
 // NewGoogleProvider creates new googleProvider provider instance with some defaults.
 func NewGoogleProvider() goauth.Provider {
-	return &googleProvider{&goauth.OAuth2Config{
+	return &googleProvider{OAuth2Config: &goauth.OAuth2Config{
 		Ctx:         context.Background(),
-		DisplayName: "googleProvider",
+		DisplayName: "Google",
 		AuthUrl:     "https://accounts.google.com/o/oauth2/auth",
 		TokenUrl:    "https://accounts.google.com/o/oauth2/token",
 		UserApiUrl:  "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -61,6 +62,7 @@ func (p *googleProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, err
 		RawUser:      rawUser,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	if extracted.VerifiedEmail {
@@ -87,14 +89,5 @@ func (p *googleProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error
 
 // ValidateConfig validates the provider configuration.
 func (p *googleProvider) ValidateConfig() error {
-	if p.GetClientId() == "" {
-		return errors.New("client ID is required")
-	}
-	if p.GetClientSecret() == "" {
-		return errors.New("client secret is required")
-	}
-	if p.GetRedirectUrl() == "" {
-		return errors.New("redirect URL is required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }

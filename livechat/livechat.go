@@ -4,10 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 
 	"github.com/mstgnz/goauth"
 
@@ -16,32 +12,21 @@ import (
 
 type livechatProvider struct {
 	*goauth.OAuth2Config
-	clientId     string
-	clientSecret string
-	redirectUrl  string
-	tokenUrl     string
+	goauth.BaseProvider
 }
 
 func NewLiveChatProvider() goauth.Provider {
-	oauth2Config := &goauth.OAuth2Config{
-		Ctx:          context.Background(),
-		DisplayName:  "LiveChat",
-		ClientId:     "",
-		ClientSecret: "",
-		RedirectUrl:  "",
-		AuthUrl:      "https://accounts.livechat.com/oauth/authorize",
-		TokenUrl:     "https://accounts.livechat.com/oauth/token",
-		UserApiUrl:   "https://accounts.livechat.com/v2/accounts/me",
-		Scopes:       []string{"accounts.read", "users.read"},
-		Pkce:         true,
-	}
-
 	return &livechatProvider{
-		OAuth2Config: oauth2Config,
-		clientId:     oauth2Config.ClientId,
-		clientSecret: oauth2Config.ClientSecret,
-		redirectUrl:  oauth2Config.RedirectUrl,
-		tokenUrl:     oauth2Config.TokenUrl,
+		OAuth2Config: &goauth.OAuth2Config{
+			Ctx:         context.Background(),
+			DisplayName: "LiveChat",
+			AuthUrl:     "https://accounts.livechat.com/oauth/authorize",
+			TokenUrl:    "https://accounts.livechat.com/oauth/token",
+			UserApiUrl:  "https://accounts.livechat.com/v2/accounts/me",
+			Scopes:      []string{"accounts.read", "users.read"},
+			Pkce:        true,
+		},
+		BaseProvider: goauth.BaseProvider{},
 	}
 }
 
@@ -51,33 +36,37 @@ func (p *livechatProvider) FetchUser(token *oauth2.Token) (*goauth.Credential, e
 		return nil, err
 	}
 
-	var response struct {
-		Id        string `json:"id"`
-		Name      string `json:"name"`
-		Email     string `json:"email"`
-		Avatar    string `json:"avatar"`
-		AccountId string `json:"account_id"`
+	rawUser := map[string]any{}
+	if err = json.Unmarshal(data, &rawUser); err != nil {
+		return nil, err
 	}
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	extracted := struct {
+		Id    string `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Avatar string `json:"avatar"`
+	}{}
+	if err = json.Unmarshal(data, &extracted); err != nil {
 		return nil, err
 	}
 
 	user := &goauth.Credential{
-		Id:        response.Id,
-		Name:      response.Name,
-		Email:     response.Email,
-		AvatarUrl: response.Avatar,
+		Id:           extracted.Id,
+		Name:         extracted.Name,
+		Email:        extracted.Email,
+		AvatarUrl:    extracted.Avatar,
+		RawUser:      rawUser,
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
 	}
 
 	return user, nil
 }
 
 func (p *livechatProvider) ValidateConfig() error {
-	if p.clientId == "" || p.clientSecret == "" || p.redirectUrl == "" {
-		return errors.New("client id, client secret and redirect url are required")
-	}
-	return nil
+	return p.BaseProvider.ValidateConfig(p.GetClientId(), p.GetClientSecret(), p.GetRedirectUrl())
 }
 
 func (p *livechatProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, error) {
@@ -85,38 +74,13 @@ func (p *livechatProvider) RefreshToken(token *oauth2.Token) (*oauth2.Token, err
 		return nil, errors.New("refresh token is required")
 	}
 
-	data := url.Values{}
-	data.Set("grant_type", "refresh_token")
-	data.Set("refresh_token", token.RefreshToken)
-	data.Set("client_id", p.clientId)
-	data.Set("client_secret", p.clientSecret)
-
-	req, err := http.NewRequest("POST", p.tokenUrl, strings.NewReader(data.Encode()))
-	if err != nil {
-		return nil, err
+	config := &oauth2.Config{
+		ClientID:     p.GetClientId(),
+		ClientSecret: p.GetClientSecret(),
+		Endpoint: oauth2.Endpoint{
+			TokenURL: p.GetTokenUrl(),
+		},
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var result struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return &oauth2.Token{
-		AccessToken: result.AccessToken,
-		TokenType:   result.TokenType,
-		Expiry:      time.Now().Add(time.Duration(result.ExpiresIn) * time.Second),
-	}, nil
+	return config.TokenSource(p.GetContext(), token).Token()
 }

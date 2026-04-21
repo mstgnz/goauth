@@ -91,7 +91,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "test-secret",
 			redirectURL:  "http://localhost:8080/callback",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client ID is required",
 		},
 		{
 			name:         "Empty client secret",
@@ -99,7 +99,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "",
 			redirectURL:  "http://localhost:8080/callback",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "client secret is required",
 		},
 		{
 			name:         "Empty redirect URL",
@@ -107,7 +107,7 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 			clientSecret: "test-secret",
 			redirectURL:  "",
 			wantErr:      true,
-			expectedErr:  "client id, client secret and redirect url are required",
+			expectedErr:  "redirect URL is required",
 		},
 		{
 			name:         "Valid configuration",
@@ -123,9 +123,9 @@ func TestValidateConfig_TableDriven(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := NewXProvider()
 			xProvider := provider.(*xProvider)
-			xProvider.clientId = tt.clientID
-			xProvider.clientSecret = tt.clientSecret
-			xProvider.redirectUrl = tt.redirectURL
+			xProvider.SetClientId(tt.clientID)
+			xProvider.SetClientSecret(tt.clientSecret)
+			xProvider.SetRedirectUrl(tt.redirectURL)
 
 			err := xProvider.ValidateConfig()
 			if (err != nil) != tt.wantErr {
@@ -319,9 +319,9 @@ func TestRefreshToken_WithMockServer(t *testing.T) {
 
 			provider := NewXProvider()
 			xProvider := provider.(*xProvider)
-			xProvider.tokenUrl = server.URL
-			xProvider.clientId = tt.clientID
-			xProvider.clientSecret = tt.clientSecret
+			xProvider.SetTokenUrl(server.URL)
+			xProvider.SetClientId(tt.clientID)
+			xProvider.SetClientSecret(tt.clientSecret)
 
 			newToken, err := xProvider.RefreshToken(tt.token)
 			if (err != nil) != tt.wantErr {
